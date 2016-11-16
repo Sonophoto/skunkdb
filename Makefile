@@ -52,19 +52,31 @@
 ### TODO config for presence of gcc, abort if not found
 CC = gcc
 
-### Set which standard that we want to use:
-C_STANDARD = -std=c11 -fpcc-struct-return 
+### Use C 2011 ISO standard, pointer struct returns and force compliance:
+#C_STANDARD = -std=c11 -fpcc-struct-return --pedantic
 
-### This is the essentially ansi setup  
-# C_STANDARD = --ansi -fpcc-struct-return --pedantic
+### Use C 1999 ISO standard, pointer struct returns and force compliance:
+C_STANDARD = -std=c99 -fpcc-struct-return --pedantic
 
-### Use these flags to build data for lcov/gcov usage:
-GCC_FLAGS = -g -Wall -fprofile-arcs -ftest-coverage 
+### Dan's Original gcc call on the concurrency test:
+# gcc -std=gnu99 test.c -o test -lsqlite3 -lpthread 
+
+
+
+### Use C 1989 ANSI standard, pointer struct returns and force compliance:
+#C_STANDARD = -std=c89 --ansi -fpcc-struct-return --pedantic
+
+### Use GNU Wild West mode.
+#C_STANDARD = -std=g11 -fpcc-struct-return
 
 ### This is the basic invocation, debug and all warnings
 # GCC_FLAGS = -g -Wall
 
+### Use these flags to build data for lcov/gcov usage:
+# GCC_FLAGS = -g -Wall -fprofile-arcs -ftest-coverage 
+
 ### Define any tools we are using and flag variables
+### This is where configuration can come it...
 RM = rm
 RM_FLAGS = -f
 
@@ -79,55 +91,34 @@ RM_FLAGS = -f
 #****************************************************************************
 
 # The location of the Soar kernel library, libsoarkernel.a
-KERNEL_DIR =		../kernel
-KERNEL_LIB_SPEC =	-L$(KERNEL_DIR) -lsoarkernel
-KERNEL_INCLUDE_DIR =	../kernel
 
-# System install directory for libs
-# TODO this needs configged
-LIB_RUNTIME_DIR =	/usr/lib
-
-# Directories for installation
-#TODO this needs configged
 SRC_DIR =		.
-TOP_DIR =		./..
 
 # TODO: Is any of this CRUFT?
 DEFINE_FLAGS = \
--DSOAR_LIBRARY=\"$(SOAR_LIBRARY)\" \
 -DSTDC_HEADERS=1 \
 -DHAVE_UNISTD_H=1 \
--DTIME_WITH_SYS_TIME=1 \
--DHAVE_GETHOSTNAME=1 \
--DHAVE_GETTIMEOFDAY=1 \
--DHAVE_GETWD=1 \
 
 INCLUDE_FLAGS =	\
--I$(KERNEL_INCLUDE_DIR) \
 
 CFLAGS = \
 $(GCC_FLAGS) \
 $(C_STANDARD) \
-$(SHLIB_CFLAGS) \
 $(DEFINE_FLAGS) \
 $(INCLUDE_FLAGS) \
 
 # Library specifications
-MATH_LIBS =		-lieee -lm
-LIBS =			$(KERNEL_LIB_SPEC)  -ldl \
-                          $(MATH_LIBS) -lc
+MATH_LIBS = -lieee -lm
+
+### This iswhere we setup and alternative C Library if we wish...
+LIBS =	\
+-lpthread
+# MATH LIBS MUST BE ON THE END!
+$(MATH_LIBS) -lc
 
 # We build all of the source files as individual compilation units and then
 # we link the object files together with our external libraries
-OBJS =	parsing.o\
-        commands.o \
-	callbacks.o \
-        utilifuncs.o \
-        demos/counter_demo.o \
-	demos/toh_demo.o \
-        linenoise/linenoise.o \
-        linenoise/utf8.o
-
+OBJS =	
 
 #****************************************************************************
 #  Targets          _                       _       
@@ -139,38 +130,23 @@ OBJS =	parsing.o\
 #
 #****************************************************************************
 
-# DEFAULT targets, add any targets below or define your own.
+### TODO BUGBUG Targets are NOT correctly set-up, I'm not sure how exactly we want to build this...
 all:	sqlite3 skunkdb
 
 sqlite:	sqlite3.a
 
-skunkdb:    $(OBJS) main.o 
-	$(CC) $(CFLAGS) -o SiOO $(OBJS) main.o $(LIBS) 
+skunkdb:    $(OBJS)
+	$(CC) $(CFLAGS) -o skunkdb $(OBJS) $(LIBS) 
 
-libSiOO.a: $(OBJS)
-	$(AR) $(ARFLAGS) libSiOO.a $(OBJS)
-
-tests: tests.o $(OBJS)
-	$(CC) $(CFLAGS) -o tests tests.o $(OBJS) $(LIBS)
+tests:      $(OBJS)
+	$(CC) $(CFLAGS) -o tests $(OBJS) $(LIBS)
 
 
 clean:
-	$(RM) $(RM_FLAGS) *.o demos/*.o linenoise/*.o *.gcno demos/*.gcno linenoise/*.gcno
-	$(RM) $(RM_FLAGS) *.gcda demos/*.gcda linenoise/*.gcda 
-	$(RM) $(RM_FLAGS) core *~ toh-moves.mov soarerror
+	$(RM) $(RM_FLAGS) *.o *.gcno
+	$(RM) $(RM_FLAGS) core *~
 
 distclean: clean
-	$(RM) $(RM_FLAGS) SiOO sioo libSiOO.a .sioo_history
-
-
+	$(RM) $(RM_FLAGS) *.gcda *.a 
+	
 testing:
-# Foreach test passed, output " *PASS* Test_00N Description_string_for_test\n"
-# If all tests are passed, output " *PASS* SiOO PASSES ALL TESTS\n"
-	# ./SiOO cli/testing/test_001
-	# ./SiOO cli/testing/test_002
-	# ./SiOO cli/testing/test_003
-	# ./SiOO cli/testing/test_004
-	# ./SiOO cli/testing/test_005
-	# ./SiOO cli/testing/test_006
-
-
