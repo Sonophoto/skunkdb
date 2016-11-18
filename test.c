@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "sqlite3.h"
+#include <sqlite3.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -24,7 +24,7 @@ void *longQueryDisk(void *threadid){
   int rc;
   char sqlQuery[] = "SELECT sum(val) from test";
   
-  rc = sqlite3_open("data.sqlite3", &db);
+  rc = sqlite3_open("data.sl3", &db);
   if( rc ){
     fprintf(stderr, "Can't open database: %s\nIn countAllDisk", sqlite3_errmsg(db));
     sqlite3_close(db);
@@ -52,11 +52,25 @@ void *longQueryMem(void *threadid){
     sqlite3_free(db);
   }
 
+  rc = sqlite3_exec(db, "PRAGMA read_uncommitted = True;", 0, 0, &zErrMsg);
+  if( rc!=SQLITE_OK ) {
+    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+    sqlite3_free(zErrMsg);
+  }
+
   rc = sqlite3_exec(db, sqlQuery, callback, 0, &zErrMsg);
   if( rc!=SQLITE_OK ) {
     fprintf(stderr, "SQL error: %s\n", zErrMsg);
     sqlite3_free(zErrMsg);
   }
+
+  rc = sqlite3_exec(db, "PRAGMA read_uncommitted;", callback, 0, &zErrMsg);
+  if( rc!=SQLITE_OK ) {
+    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+    sqlite3_free(zErrMsg);
+  }
+
+  
   sqlite3_close(db);
   pthread_exit(NULL);
 }
@@ -69,10 +83,9 @@ sqlite3 *loadData(){
   char *zErrMsg = 0;
   int rc;
   char create_table_stmt[] = "CREATE TABLE test (name string, val integer)";
-  char populate_mem_db[] = "ATTACH DATABASE 'data.sqlite3' as data; INSERT INTO test SELECT * from data.test";
+  char populate_mem_db[] = "ATTACH DATABASE 'data.sl3' as data; INSERT INTO test SELECT * from data.test";
 
-
-  rc = sqlite3_open_v2("file::memory:?cache=shared", &db, SQLITE_OPEN_URI | SQLITE_OPEN_READWRITE, NULL);
+  rc = sqlite3_open_v2("file::memory:?cache=shared", &db, SQLITE_OPEN_URI | SQLITE_OPEN_READWRITE | SQLITE_OPEN_NOMUTEX, NULL);
   if( rc ){
     fprintf(stderr, "Can't open database: %s\nIn loadData\n", sqlite3_errmsg(db));
     sqlite3_free(db);
@@ -90,6 +103,20 @@ sqlite3 *loadData(){
     fprintf(stderr, "SQL error: %s\n", zErrMsg);
     sqlite3_free(zErrMsg);
   }
+
+  rc = sqlite3_exec(db, "PRAGMA read_uncommitted = True;", 0, 0, &zErrMsg);
+  if( rc!=SQLITE_OK ) {
+    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+    sqlite3_free(zErrMsg);
+  }
+
+  rc = sqlite3_exec(db, "PRAGMA read_uncommitted;", callback, 0, &zErrMsg);
+  if( rc!=SQLITE_OK ) {
+    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+    sqlite3_free(zErrMsg);
+  }
+
+  printf("Leaving loadData()\n");
 
   return db;
 }
