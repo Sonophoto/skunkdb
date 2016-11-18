@@ -15,3 +15,8 @@ Not clear yet if glibc has C11 threads yet: https://github.com/jtsiomb/c11thread
 So glibc says they "conform" but the important parts of the C11 are all optional (?!?)
 
 There is also the musl library which provided this comparrison:http://www.etalabs.net/compare_libcs.html
+
+#Security:
+
+Notes on possibly of SQL Injection attacks on loadable SQL modules: https://www.invincealabs.com/blog/2016/11/sqlite-shell-script/
+
