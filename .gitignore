@@ -31,3 +31,9 @@
 # Debug files
 *.dSYM/
 *.su
+
+skunkdb
+mommemvfs.so
+sqlite3.so
+concurrency_test
+data.sqlite3

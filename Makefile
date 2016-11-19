@@ -81,6 +81,7 @@ MATH_LIBS = -lm
 
 LIBS =	\
 -lpthread \
+-ldl \
 $(MATH_LIBS)
 
 
@@ -100,28 +101,28 @@ RM_FLAGS = -f
 #****************************************************************************
 
 ### TODO BUGBUG Targets are NOT correctly set-up, I'm not sure how exactly we want to build this...
-all:	sqlite3 modmemvfs skunkdb threadtest
+all:	#sqlite3 shell modmemvfs concurrent_read 
 
-sqlite3: 
-	$(CC) $(CFLAGS) $(SHLIB_FLAGS) sqlite3.c -o sqlite3.o
+sqlite3:  
+	$(CC) $(CFLAGS) $(SHLIB_FLAGS) sqlite3.c -o sqlite3.o $(LIBS)
 
-modmemvfs:
-	$(CC) $(CFLAGS) $(SHLIB_FLAGS) modmemvfs.c sqlite3.o -o modmemvfs.so 
+shell:  
+	$(CC) $(CFLAGS) shell.c sqlite3.c -o shell $(LIBS)
 
-skunkdb: sqlite3.o
-#	$(CC) $(CFLAGS) -o skunkdb $(OBJS) $(LIBS) 
+modmemvfs: 
+	$(CC) $(CFLAGS) $(SHLIB_FLAGS) modmemvfs.c -o modmemvfs.so
 
-threadtest: 
-	$(CC) $(CFLAGS) concurrent_read.c -o concurrent_read 
+concurrent_read:
+	$(CC) $(CFLAGS) concurrent_read.c sqlite3.c -o concurrent_read $(LIBS)
 
 clean:
 	$(RM) $(RM_FLAGS) core *.bak
-	$(RM) $(RM_FLAGS) concurrent_read modmemvfs.so sqlite3.o
+	$(RM) $(RM_FLAGS) concurrent_read modmemvfs.so shell
 
 
 distclean: clean
-	$(RM) $(RM_FLAGS) data.sqlite3 
-	$(RM) $(RM_FLAGS) *.a *.o *.so *.gcno *.gcda skunkdb tests
+	$(RM) $(RM_FLAGS) data.sqlite3 sqlite3.o  
+	$(RM) $(RM_FLAGS) *.a *.o *.so *.gcno *.gcda 
 	$(RM) $(RM_FLAGS) # Coverage and browsing files
 
 
