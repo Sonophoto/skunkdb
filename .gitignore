@@ -32,8 +32,7 @@
 *.dSYM/
 *.su
 
-skunkdb
 mommemvfs.so
-sqlite3.so
-concurrency_test
+sqlite3.o
+concurrent_read
 data.sqlite3

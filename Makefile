@@ -28,8 +28,6 @@
 #   distclean: Removes intermediarries and output files
 #
 #****************************************************************************
-# Dan's Original gcc call on the concurrency test:
-# gcc -std=gnu99 test.c -o test -lsqlite3 -lpthread 
 
 ### Set our default compiler
 CC = gcc
@@ -38,25 +36,24 @@ CC = gcc
 ### Here we configure which version of C we are using:
 C_ISO11P_PSR_STD = -std=c11 --pedantic -fpcc-struct-return
 C_ISO99P_PSR_STD = -std=c99 --pedantic -fpcc-struct-return
-C_ANSI89_PSR_STD = -std=c89 --ansi --pedantic -fpcc-struct-return
-C_GNU11P_PSR_STD = -std=g11 -fpcc-struct-return
-C_GNU99P_PSR_STD = -std=g99 -fpcc-struct-return
-C_GNUANSI_PSR_STD = -std=g89 -fpcc-struct-return
+C_ANSI89P_PSR_STD = -std=c89 --ansi --pedantic -fpcc-struct-return
+C_GNU11_PSR_STD = -std=gnu11 -fpcc-struct-return
+C_GNU99_PSR_STD = -std=gnu99 -fpcc-struct-return
+C_GNU89_PSR_STD = -std=gnu89 -fpcc-struct-return
 
 C_STANDARD = $(C_ISO99P_PSR_STD)
 
 
 ### Next we configure build options for the compiler:
 GCC_DW_FLAGS = -g -Wall
-
 GCC_DWCOVER_FLAGS = -g -Wall -fprofile-arcs -ftest-coverage 
 
 GCC_FLAGS = $(GCC_DW_FLAGS)
 
+
 ### Build Flags for Static and Loadable
 STATIC_FLAGS = -static 
 SHLIB_FLAGS = -fPIC -shared
-
 
 
 ### Now we add in all of our -Ds
@@ -69,12 +66,14 @@ DEFINE_FLAGS = \
 INCLUDE_FLAGS = \
 -I.
 
+
 ### Now we build up a default set of compiler flags 
 CFLAGS = \
 $(GCC_FLAGS) \
 $(C_STANDARD) \
 $(DEFINE_FLAGS) \
 $(INCLUDE_FLAGS) \
+
 
 ### Finally we set up the libraries we need to link with
 MATH_LIBS = -lm
@@ -100,8 +99,7 @@ RM_FLAGS = -f
 #
 #****************************************************************************
 
-### TODO BUGBUG Targets are NOT correctly set-up, I'm not sure how exactly we want to build this...
-all:	#sqlite3 shell modmemvfs concurrent_read 
+all:	sqlite3 shell modmemvfs concurrent_read 
 
 sqlite3:  
 	$(CC) $(CFLAGS) $(SHLIB_FLAGS) sqlite3.c -o sqlite3.o $(LIBS)
