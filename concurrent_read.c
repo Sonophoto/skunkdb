@@ -1,10 +1,10 @@
 #include <stdio.h>
-#include "sqlite3.h"
-#include <pthread.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include <pthread.h>
+#include <sqlite3.h>
 
 #define MAX_THREADS 100
 

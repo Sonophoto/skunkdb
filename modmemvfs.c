@@ -30,6 +30,7 @@
 */
 #include <sqlite3ext.h>
 SQLITE_EXTENSION_INIT1
+
 #include <string.h>
 #include <assert.h>
 
@@ -471,7 +472,7 @@ __declspec(dllexport)
 ** This routine is called when the extension is loaded.
 ** Register the new VFS.
 */
-int sqlite3_memvfs_init(
+int sqlite3_modmemvfs_init(
   sqlite3 *db, 
   char **pzErrMsg, 
   const sqlite3_api_routines *pApi
