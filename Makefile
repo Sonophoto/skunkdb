@@ -43,7 +43,7 @@ C_GNU11P_PSR_STD = -std=g11 -fpcc-struct-return
 C_GNU99P_PSR_STD = -std=g99 -fpcc-struct-return
 C_GNUANSI_PSR_STD = -std=g89 -fpcc-struct-return
 
-C_STANDARD = C_ISO99P_PSR_STD 
+C_STANDARD = $(C_ISO99P_PSR_STD)
 
 
 ### Next we configure build options for the compiler:
@@ -51,11 +51,13 @@ GCC_DW_FLAGS = -g -Wall
 
 GCC_DWCOVER_FLAGS = -g -Wall -fprofile-arcs -ftest-coverage 
 
-GCC_FLAGS = GCC_DW_FLAGS
+GCC_FLAGS = $(GCC_DW_FLAGS)
 
 ### Build Flags for Static and Loadable
+STATIC_FLAGS = -static 
+SHLIB_FLAGS = -fPIC -shared
 
-LOADABLE_FLAGS = -fPIC -shared
+
 
 ### Now we add in all of our -Ds
 DEFINE_FLAGS = \
@@ -64,7 +66,8 @@ DEFINE_FLAGS = \
 
 
 ### Now we add in all of our -Is
-INCLUDE_FLAGS =
+INCLUDE_FLAGS = \
+-I.
 
 ### Now we build up a default set of compiler flags 
 CFLAGS = \
@@ -77,14 +80,9 @@ $(INCLUDE_FLAGS) \
 MATH_LIBS = -lm
 
 LIBS =	\
--lpthread
+-lpthread \
 $(MATH_LIBS)
 
-
-#****************************************************************************
-#  References
-#
-#****************************************************************************
 
 ### Define any tools we are using and flag variables
 RM = rm
@@ -105,24 +103,28 @@ RM_FLAGS = -f
 all:	sqlite3 modmemvfs skunkdb threadtest
 
 sqlite3: 
-	$(CC) $(CFLAGS) sqlite3.c -o sqlite3.o
+	$(CC) $(CFLAGS) $(SHLIB_FLAGS) sqlite3.c -o sqlite3.o
 
 modmemvfs:
-	$(CC) $(CFLAGS) $(LOADABLE_FLAGS) modmemvfs.c -o modmemvfs.so 
+	$(CC) $(CFLAGS) $(SHLIB_FLAGS) modmemvfs.c sqlite3.o -o modmemvfs.so 
 
-skunkdb: sqlite3
+skunkdb: sqlite3.o
 #	$(CC) $(CFLAGS) -o skunkdb $(OBJS) $(LIBS) 
 
-threadtest: modmemvfs
-	$(CC) $(CFLAGS) threadtest.c -o threadtest
+threadtest: 
+	$(CC) $(CFLAGS) concurrent_read.c -o concurrent_read 
 
 clean:
 	$(RM) $(RM_FLAGS) core *.bak
+	$(RM) $(RM_FLAGS) concurrent_read modmemvfs.so sqlite3.o
+
 
 distclean: clean
-	$(RM) $(RM_FLAGS)	
+	$(RM) $(RM_FLAGS) data.sqlite3 
 	$(RM) $(RM_FLAGS) *.a *.o *.so *.gcno *.gcda skunkdb tests
 	$(RM) $(RM_FLAGS) # Coverage and browsing files
+
+
 testing:
 #	$(CC) $(CFLAGS) -o skunkdb $(OBJS) $(LIBS) 
 
