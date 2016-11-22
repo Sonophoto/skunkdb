@@ -6,7 +6,7 @@
 ####Status (18-Nov-2016 EoD): **BUILDS AND RUNS**
 -----
 
-Essentially we are screwing around with concurrency and VFS plugins in SQLite3 
+Essentially we are testing concurrency and VFS plugins in SQLite3 
 
 Inspired by a gist from @danielrmeyer
 
