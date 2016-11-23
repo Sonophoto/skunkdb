@@ -32,7 +32,9 @@
 *.dSYM/
 *.su
 
-mommemvfs.so
+modmemvfs.so
 sqlite3.o
 concurrent_read
+shell
+sqlite-cli
 data.sqlite3
