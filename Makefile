@@ -41,7 +41,8 @@ C_GNU11_PSR_STD = -std=gnu11 -fpcc-struct-return
 C_GNU99_PSR_STD = -std=gnu99 -fpcc-struct-return
 C_GNU89_PSR_STD = -std=gnu89 -fpcc-struct-return
 
-C_STANDARD = $(C_ISO99P_PSR_STD)
+C_STANDARD = $(C_GNU99_PSR_STD)
+
 
 
 ### Next we configure build options for the compiler:
