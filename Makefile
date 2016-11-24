@@ -20,12 +20,13 @@
 #
 #     TARGETS: (Default is  skunkdb)
 #
-#         all: Depends on skunkdb and sqlite
-#     skunkdb: Builds the skunkdb plugin 
-#      sqlite: Builds the sqlite library and CLI 
-#        test: Builds and runs all tests with PASS|FAIL output
-#       clean: Removes intermediary files leaves binaries
-#   distclean: Removes intermediarries and output files
+#         all: shell and modmemvfs plugin
+#        libs: sqlite3.o and linenoise.o objects for linking
+#       shell: builds the cli-sqlite3 command line interface
+#       tests: Builds and runs all tests
+#       clean: Removes intermediary files, leaves binaries
+#   dataclean: Removes all database files
+#   distclean: Removes all generated files
 #
 #****************************************************************************
 
@@ -66,7 +67,7 @@ DEFINE_FLAGS = \
 ### Now we add in all of our -Is
 INCLUDE_FLAGS = \
 -I. \
--Ilinenoise
+-Ilinenoise \
 
 
 ### Now we build up a default set of compiler flags 
@@ -78,16 +79,17 @@ $(INCLUDE_FLAGS) \
 
 
 ### Next we setup our SQLite3 customizations
+# DSQLITE_ENABLE_JSON1        https://www.sqlite.org/json1.html
+# DSQLITE_ENABLE_UNLOCK_NOTIFY https://www.sqlite.org/unlock_notify.html
 SQLITE3_FLAGS = \
 -DSQLITE_ENABLE_JSON1 \
 -DSQLITE_ENABLE_UNLOCK_NOTIFY \
 
-# https://www.sqlite.org/json1.html
-# https://www.sqlite.org/unlock_notify.html
-
 ### Then our shell customizations
+#NOTE: Linenoise: We name the C file on the gcc command line, no obj.
 SHELL_FLAGS = \
 -DHAVE_LINENOISE \
+
 
 ### Finally we set up the libraries we need to link with
 MATH_LIBS = -lm
@@ -113,31 +115,44 @@ RM_FLAGS = -f
 #
 #****************************************************************************
 
-all:	sqlite3 shell modmemvfs concurrent_read 
+all:	shell modmemvfs 
 
-sqlite3:  
-	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHLIB_FLAGS) sqlite3.c -o sqlite3.o $(LIBS)
+sqlite3.o:  
+	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHLIB_FLAGS) \
+        sqlite3.c -o sqlite3.o \
+        $(LIBS)
+
+linenoise.o:  
+	$(CC) $(CFLAGS) $(SHLIB_FLAGS) \
+        linenoise/linenoise.c -o linenoise/linenoise.o \
+        $(LIBS)
 
 shell:  
-	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHELL_FLAGS) sqlite3.c shell.c linenoise/linenoise.c -o cli-sqlite3 $(LIBS)
+	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHELL_FLAGS) \
+        sqlite3.c shell.c linenoise/linenoise.c -o cli-sqlite3 \
+        $(LIBS)
 
 modmemvfs: 
 	$(CC) $(CFLAGS) $(SHLIB_FLAGS) modmemvfs.c -o modmemvfs.so
 
-concurrent_read:
-	$(CC) $(CFLAGS) concurrent_read.c sqlite3.c -o concurrent_read $(LIBS)
+
+libs: sqlite3.o linenoise.o
 
 clean:
 	$(RM) $(RM_FLAGS) core *.bak
-	$(RM) $(RM_FLAGS) concurrent_read modmemvfs.so shell cli-sqlite
+	$(RM) $(RM_FLAGS) concurrent_read modmemvfs.so shell cli-sqlite3
+	$(RM) $(RM_FLAGS) linenoise/linenoise.o sqlite3.o
 
+dataclean:
+	$(RM) $(RM_FLAGS) *.sqlite3
+	
 
-distclean: clean
-	$(RM) $(RM_FLAGS) data.sqlite3 sqlite3.o linenoise.o  
+distclean: clean dataclean
 	$(RM) $(RM_FLAGS) *.a *.o *.so *.gcno *.gcda 
-	$(RM) $(RM_FLAGS) # Coverage and browsing files
+	$(RM) $(RM_FLAGS) *.gcov 
 
 
-testing:
+tests:
+	$(CC) $(CFLAGS) concurrent_read.c sqlite3.c -o concurrent_read $(LIBS)
 #	$(CC) $(CFLAGS) -o skunkdb $(OBJS) $(LIBS) 
 
