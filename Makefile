@@ -79,6 +79,11 @@ $(INCLUDE_FLAGS) \
 
 ### Next we setup our SQLite3 customizations
 SQLITE3_FLAGS = \
+-DSQLITE_ENABLE_JSON1 \
+-DSQLITE_ENABLE_UNLOCK_NOTIFY \
+
+# https://www.sqlite.org/json1.html
+# https://www.sqlite.org/unlock_notify.html
 
 ### Then our shell customizations
 SHELL_FLAGS = \
