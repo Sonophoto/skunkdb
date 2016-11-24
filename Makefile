@@ -18,15 +18,16 @@
 #****************************************************************************
 #  Documentation 
 #
-#     TARGETS: (Default is  skunkdb)
+#     TARGETS: (Default is all)
 #
 #         all: shell and modmemvfs plugin
-#        libs: sqlite3.o and linenoise.o objects for linking
-#       shell: builds the cli-sqlite3 command line interface
+#        libs: Builds objects sqlite3.o and linenoise.o for linking
+#       shell: Builds the cli-sqlite3 command line interface
 #       tests: Builds and runs all tests
 #       clean: Removes intermediary files, leaves binaries
 #   dataclean: Removes all database files
 #   distclean: Removes all generated files
+#        help: Outputs usage Information
 #
 #****************************************************************************
 
@@ -103,7 +104,7 @@ $(MATH_LIBS)
 ### Define any tools we are using and flag variables
 RM = rm
 RM_FLAGS = -f
-
+ECHO_APP = @echo
 
 #****************************************************************************
 #  Targets          _                       _       
@@ -156,3 +157,26 @@ tests:
 	$(CC) $(CFLAGS) concurrent_read.c sqlite3.c -o concurrent_read $(LIBS)
 #	$(CC) $(CFLAGS) -o skunkdb $(OBJS) $(LIBS) 
 
+help:
+	$(ECHO_APP)
+	$(ECHO_APP) SKUNDB Testing System for multithreaded SQLite3
+	$(ECHO_APP)
+	$(ECHO_APP) Build Targets:
+	$(ECHO_APP)
+	$(ECHO_APP) all: shell and modmemvfs plugin
+	$(ECHO_APP) libs: sqlite3.o and linenoise.o objects for linking
+	$(ECHO_APP) shell: builds the cli-sqlite3 command line interface
+	$(ECHO_APP) tests: Builds and runs all tests
+	$(ECHO_APP)
+	$(ECHO_APP) Cleaning Targets:
+	$(ECHO_APP)
+	$(ECHO_APP) clean: Removes intermediary files, leaves binaries
+	$(ECHO_APP) dataclean: Removes all database files
+	$(ECHO_APP) distclean: Removes all generated files
+	$(ECHO_APP)
+	$(ECHO_APP) For more info link-to:
+	$(ECHO_APP)
+	$(ECHO_APP) https://github.com/Sonophoto/skunkdb
+	$(ECHO_APP) https://www.sqlite.org/docs.html 
+	$(ECHO_APP)
+	
