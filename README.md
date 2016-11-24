@@ -5,8 +5,10 @@
 
 
 ####Status 
-(23-Nov-2016 Eod): **sqlite3 is built with JSON and ENABLE_UNLOCK_NOTIFY
+(23-Nov-2016 Eod): **sqlite3 is built with JSON and ENABLE_UNLOCK_NOTIFY**
+
 (23-Nov-2016 EoD): **cli-sqlite3 is built with antirez/linenoise**
+
 (18-Nov-2016 EoD): **BUILDS AND RUNS**
 -----
 
