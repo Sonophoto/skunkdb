@@ -65,7 +65,8 @@ DEFINE_FLAGS = \
 
 ### Now we add in all of our -Is
 INCLUDE_FLAGS = \
--I.
+-I. \
+-Ilinenoise
 
 
 ### Now we build up a default set of compiler flags 
@@ -75,6 +76,13 @@ $(C_STANDARD) \
 $(DEFINE_FLAGS) \
 $(INCLUDE_FLAGS) \
 
+
+### Next we setup our SQLite3 customizations
+SQLITE3_FLAGS = \
+
+### Then our shell customizations
+SHELL_FLAGS = \
+-DHAVE_LINENOISE \
 
 ### Finally we set up the libraries we need to link with
 MATH_LIBS = -lm
@@ -103,10 +111,10 @@ RM_FLAGS = -f
 all:	sqlite3 shell modmemvfs concurrent_read 
 
 sqlite3:  
-	$(CC) $(CFLAGS) $(SHLIB_FLAGS) sqlite3.c -o sqlite3.o $(LIBS)
+	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHLIB_FLAGS) sqlite3.c -o sqlite3.o $(LIBS)
 
 shell:  
-	$(CC) $(CFLAGS) shell.c sqlite3.c -o shell $(LIBS)
+	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHELL_FLAGS) sqlite3.c shell.c linenoise/linenoise.c -o cli-sqlite3 $(LIBS)
 
 modmemvfs: 
 	$(CC) $(CFLAGS) $(SHLIB_FLAGS) modmemvfs.c -o modmemvfs.so
@@ -116,11 +124,11 @@ concurrent_read:
 
 clean:
 	$(RM) $(RM_FLAGS) core *.bak
-	$(RM) $(RM_FLAGS) concurrent_read modmemvfs.so shell
+	$(RM) $(RM_FLAGS) concurrent_read modmemvfs.so shell cli-sqlite
 
 
 distclean: clean
-	$(RM) $(RM_FLAGS) data.sqlite3 sqlite3.o  
+	$(RM) $(RM_FLAGS) data.sqlite3 sqlite3.o linenoise.o  
 	$(RM) $(RM_FLAGS) *.a *.o *.so *.gcno *.gcda 
 	$(RM) $(RM_FLAGS) # Coverage and browsing files
 

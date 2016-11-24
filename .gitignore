@@ -34,7 +34,8 @@
 
 modmemvfs.so
 sqlite3.o
+linenoise.o
 concurrent_read
 shell
-sqlite-cli
+cli-sqlite3
 data.sqlite3
