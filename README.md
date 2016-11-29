@@ -1,6 +1,6 @@
 # skunkdb
 
-This is a testing harness for threading and VFS plugins in SQLite3 
+This is a testing harness for threading and VFS plugin development for SQLite3 
 
 Inspired by a gist from @danielrmeyer
 
