@@ -33,7 +33,7 @@ C11 Atomics w/ Links to Papers: https://gcc.gnu.org/wiki/Atomic
 
 ####Security Notes:
 
-Notes on possibly of SQL Injection attacks on loadable SQL modules: https://www.invincealabs.com/blog/2016/11/sqlite-shell-script/ SQLite3 Docs on Extensions: https://www.sqlite.org/c3ref/load_extension.html
+Notes on possibility of SQL Injection attacks on loadable SQL modules: https://www.invincealabs.com/blog/2016/11/sqlite-shell-script/ SQLite3 Docs on Extensions: https://www.sqlite.org/c3ref/load_extension.html
 
 -----
 
