@@ -33,7 +33,7 @@
 
 ### Set our default compiler
 CC = gcc
-
+#CC = clang
 
 ### Here we configure which version of C we are using:
 C_ISO11P_PSR_STD = -std=c11 --pedantic -fpcc-struct-return
@@ -122,11 +122,13 @@ sqlite3.o:
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHLIB_FLAGS) \
         sqlite3.c -o sqlite3.o \
         $(LIBS)
+	ar rcs sqlite3.a sqlite3.o
 
 linenoise.o:  
 	$(CC) $(CFLAGS) $(SHLIB_FLAGS) \
         linenoise/linenoise.c -o linenoise/linenoise.o \
         $(LIBS)
+	ar rcs linenoise/linenoise.a linenoise/linenoise.o
 
 shell:  
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHELL_FLAGS) \
@@ -142,7 +144,7 @@ libs: sqlite3.o linenoise.o
 clean:
 	$(RM) $(RM_FLAGS) core *.bak
 	$(RM) $(RM_FLAGS) concurrent_read modmemvfs.so shell cli-sqlite3
-	$(RM) $(RM_FLAGS) linenoise/linenoise.o sqlite3.o
+	$(RM) $(RM_FLAGS) linenoise/linenoise.o linenoise/linenoise.a sqlite3.a sqlite3.o
 
 dataclean:
 	$(RM) $(RM_FLAGS) *.sqlite3
