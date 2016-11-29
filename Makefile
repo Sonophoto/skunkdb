@@ -31,6 +31,16 @@
 #
 #****************************************************************************
 
+### First we choose a version of Sqlite3 by its directory name.
+### We then include only the directory with that version
+### Version number is from SQLITE_VERSION_NUMBER in sqlite3.h
+
+#SQLITE_VERSION = sqlite311000
+#SQLITE_VERSION = sqlite315001
+SQLITE_VERSION = sqlite315002
+
+
+
 ### Set our default compiler
 CC = gcc
 #CC = clang
@@ -44,7 +54,6 @@ C_GNU99_PSR_STD = -std=gnu99 -fpcc-struct-return
 C_GNU89_PSR_STD = -std=gnu89 -fpcc-struct-return
 
 C_STANDARD = $(C_GNU99_PSR_STD)
-
 
 
 ### Next we configure build options for the compiler:
@@ -69,7 +78,7 @@ DEFINE_FLAGS = \
 INCLUDE_FLAGS = \
 -I. \
 -Ilinenoise \
-
+-I$(SQLITE_VERSION) \
 
 ### Now we build up a default set of compiler flags 
 CFLAGS = \
@@ -120,9 +129,9 @@ all:	shell modmemvfs
 
 sqlite3.o:  
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHLIB_FLAGS) \
-        sqlite3.c -o sqlite3.o \
+        $(SQLITE_VERSION)/sqlite3.c -o $(SQLITE_VERSION)/sqlite3.o \
         $(LIBS)
-	ar rcs sqlite3.a sqlite3.o
+	ar rcs $(SQLITE_VERSION)/sqlite3.a $(SQLITE_VERSION)/sqlite3.o
 
 linenoise.o:  
 	$(CC) $(CFLAGS) $(SHLIB_FLAGS) \
@@ -132,7 +141,10 @@ linenoise.o:
 
 shell:  
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHELL_FLAGS) \
-        sqlite3.c shell.c linenoise/linenoise.c -o cli-sqlite3 \
+        linenoise/linenoise.c \
+        $(SQLITE_VERSION)/sqlite3.c \
+        $(SQLITE_VERSION)/shell.c \
+        -o $(SQLITE_VERSION)/cli-sqlite3 \
         $(LIBS)
 
 modmemvfs: 
@@ -143,8 +155,11 @@ libs: sqlite3.o linenoise.o
 
 clean:
 	$(RM) $(RM_FLAGS) core *.bak
-	$(RM) $(RM_FLAGS) concurrent_read modmemvfs.so shell cli-sqlite3
-	$(RM) $(RM_FLAGS) linenoise/linenoise.o linenoise/linenoise.a sqlite3.a sqlite3.o
+	$(RM) $(RM_FLAGS) concurrent_read modmemvfs.so 
+	$(RM) $(RM_FLAGS) $(SQLITE_VERSION)/cli-sqlite3
+	$(RM) $(RM_FLAGS) $(SQLITE_VERSION)/sqlite3.o
+	$(RM) $(RM_FLAGS) $(SQLITE_VERSION)/sqlite3.a
+	$(RM) $(RM_FLAGS) linenoise/linenoise.o linenoise/linenoise.a
 
 dataclean:
 	$(RM) $(RM_FLAGS) *.sqlite3
