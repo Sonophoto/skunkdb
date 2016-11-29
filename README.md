@@ -9,13 +9,14 @@ Inspired by a gist from @danielrmeyer
 -----
 
 ####Status 
-(29-Now-2016) **sqlite3 is available in 3 version. Ubuntu's 3.11.0, and 3.15.1 and 3.15.2**
+(29-Now-2016    ): **sqlite3 is available in 3 versions. Ubuntu's 3.11.0, and 3.15.1 and 3.15.2**
+                   The Rationale is that we can test with latest stable and Ubuntu's always outdated system version."
 
-(27-Nov-2016 EoD): **Added Unit Testing Macros from Sput by Alex Levine**
+(27-Nov-2016 EoD): **Added Unit Testing Macros from Sput by Alex Linke, http://www.use-strict.de/sput-unit-testing/**
 
-(23-Nov-2016 Eod): **sqlite3 is built with JSON and ENABLE_UNLOCK_NOTIFY**
+(23-Nov-2016 Eod): **sqlite3 is built with PRAGMAs JSON and ENABLE_UNLOCK_NOTIFY**
 
-(23-Nov-2016 EoD): **cli-sqlite3 is built with antirez/linenoise**
+(23-Nov-2016 EoD): **cli-sqlite3 is built with Linenoise, https://github.com/antirez/linenoise**
 
 (18-Nov-2016 EoD): **BUILDS AND RUNS**
 
