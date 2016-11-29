@@ -1,14 +1,16 @@
 # skunkdb
 
-This is a harness for testing threading and VFS plugin development for SQLite3 
+This is a harness for testing threading and VFS plugin development for SQLite3
+
+This is software for POSIX/Unix/Linux/BSD terminals not Windows GUIs.
 
 Inspired by a gist from @danielrmeyer
 
 ####Skunkdb is sponsored in part by http://modulemaster.com/rebuilds/about-us/
 
-# Usage: 
-#1 Clone this repo
-#2 type `make help`
+### Usage: 
+#### 1 Clone this repo
+#### 2 type `make help` in the root of the project.
 
 -----
 
