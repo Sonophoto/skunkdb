@@ -14,7 +14,7 @@ Inspired by a gist from @danielrmeyer
 
 -----
 
-####Status 
+#### Status:
 (29-Now-2016    ): **sqlite3 is available in 3 versions. Ubuntu's 3.11.0, and 3.15.1 and 3.15.2**
                    The Rationale is that we can test with latest stable and Ubuntu's always outdated system version."
 
@@ -28,7 +28,7 @@ Inspired by a gist from @danielrmeyer
 
 -----
 
-####Technical Notes
+#### Technical Notes:
 
 SQLITE_ENABLE_UNLOCK_NOTIFY: https://www.sqlite.org/unlock_notify.html
 
@@ -38,7 +38,7 @@ C11 Atomics w/ Links to Papers: https://gcc.gnu.org/wiki/Atomic
 
 -----
 
-####Security Notes:
+#### Security Notes:
 
 Notes on possibility of SQL injection attacks on loadable Sqlite3 modules: https://www.invincealabs.com/blog/2016/11/sqlite-shell-script/ 
 
