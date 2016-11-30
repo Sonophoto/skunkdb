@@ -30,11 +30,21 @@ Inspired by a gist from @danielrmeyer
 
 #### Technical Notes:
 
+##### SQLite3 Configurations Used:
+
 SQLITE_ENABLE_UNLOCK_NOTIFY: https://www.sqlite.org/unlock_notify.html
+
+##### Lock and Thread DSs and Algos
 
 LockFree Concurrent Priority Queue: http://www.non-blocking.com/download/SunT03_PQueue_TR.pdf
 
 C11 Atomics w/ Links to Papers: https://gcc.gnu.org/wiki/Atomic
+
+##### Multi-Thread debugging / profiling tools and research
+
+From github user: @blucia0a
+Paper on Thread Communication Traps using Provenance Analysis of Last Writer Slices: https://github.com/blucia0a/CTraps-gcc/blob/master/paper.pdf
+Repo for the CTraps-gcc thread instrumentation plugin for GNU gcc: https://github.com/blucia0a/CTraps-gcc
 
 -----
 
