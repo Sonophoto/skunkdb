@@ -14,21 +14,11 @@
 #
 #                This file probably requires GNU gmake.
 #****************************************************************************
+SHELL = /bin/sh
+.SUFFIXES:
 
 #****************************************************************************
-#  Documentation 
-#
-#     TARGETS: (Default is all)
-#
-#         all: shell and modmemvfs plugin
-#        libs: Builds objects sqlite3.o and linenoise.o for linking
-#       shell: Builds the cli-sqlite3 command line interface
-#       tests: Builds and runs all tests
-#       clean: Removes intermediary files, leaves binaries
-#   dataclean: Removes all database files
-#   distclean: Removes all generated files
-#        help: Outputs usage Information
-#
+#  Documentation: See 'help' target or type 'make help' 
 #****************************************************************************
 
 ### First we choose a version of Sqlite3 by its directory name.
@@ -39,11 +29,12 @@
 #SQLITE_VERSION = sqlite315001
 SQLITE_VERSION = sqlite315002
 
-
-
-### Set our default compiler
-CC = gcc
-#CC = clang
+### Next we setup our SQLite3 customizations
+# DSQLITE_ENABLE_JSON1         https://www.sqlite.org/json1.html
+# DSQLITE_ENABLE_UNLOCK_NOTIFY https://www.sqlite.org/unlock_notify.html
+SQLITE3_FLAGS = \
+-DSQLITE_ENABLE_JSON1 \
+-DSQLITE_ENABLE_UNLOCK_NOTIFY \
 
 ### Here we configure which version of C we are using:
 C_ISO11P_PSR_STD = -std=c11 --pedantic -fpcc-struct-return
@@ -55,6 +46,8 @@ C_GNU89_PSR_STD = -std=gnu89 -fpcc-struct-return
 
 C_STANDARD = $(C_GNU99_PSR_STD)
 
+### Set our default compiler
+CC = gcc
 
 ### Next we configure build options for the compiler:
 GCC_DW_FLAGS = -g -Wall
@@ -62,17 +55,14 @@ GCC_DWCOVER_FLAGS = -g -Wall -fprofile-arcs -ftest-coverage
 
 GCC_FLAGS = $(GCC_DW_FLAGS)
 
-
 ### Build Flags for Static and Loadable
 STATIC_FLAGS = -static 
 SHLIB_FLAGS = -fPIC -shared
-
 
 ### Now we add in all of our -Ds
 DEFINE_FLAGS = \
 -DSTDC_HEADERS=1 \
 -DHAVE_UNISTD_H=1 \
-
 
 ### Now we add in all of our -Is
 INCLUDE_FLAGS = \
@@ -87,19 +77,10 @@ $(C_STANDARD) \
 $(DEFINE_FLAGS) \
 $(INCLUDE_FLAGS) \
 
-
-### Next we setup our SQLite3 customizations
-# DSQLITE_ENABLE_JSON1        https://www.sqlite.org/json1.html
-# DSQLITE_ENABLE_UNLOCK_NOTIFY https://www.sqlite.org/unlock_notify.html
-SQLITE3_FLAGS = \
--DSQLITE_ENABLE_JSON1 \
--DSQLITE_ENABLE_UNLOCK_NOTIFY \
-
 ### Then our shell customizations
 #NOTE: Linenoise: We name the C file on the gcc command line, no obj.
 SHELL_FLAGS = \
 -DHAVE_LINENOISE \
-
 
 ### Finally we set up the libraries we need to link with
 MATH_LIBS = -lm
@@ -109,11 +90,11 @@ LIBS =	\
 -ldl \
 $(MATH_LIBS)
 
-
 ### Define any tools we are using and flag variables
 RM = rm
 RM_FLAGS = -f
-ECHO_APP = @echo
+AR = ar
+AR_FLAGS = rcs
 
 #****************************************************************************
 #  Targets          _                       _       
@@ -131,13 +112,13 @@ sqlite3.o:
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHLIB_FLAGS) \
         $(SQLITE_VERSION)/sqlite3.c -o $(SQLITE_VERSION)/sqlite3.o \
         $(LIBS)
-	ar rcs $(SQLITE_VERSION)/sqlite3.a $(SQLITE_VERSION)/sqlite3.o
+	$(AR) $(AR_FLAGS)$(SQLITE_VERSION)/sqlite3.a $(SQLITE_VERSION)/sqlite3.o
 
 linenoise.o:  
 	$(CC) $(CFLAGS) $(SHLIB_FLAGS) \
         linenoise/linenoise.c -o linenoise/linenoise.o \
         $(LIBS)
-	ar rcs linenoise/linenoise.a linenoise/linenoise.o
+	$(AR) $(AR_FLAGS) linenoise/linenoise.a linenoise/linenoise.o
 
 shell:  
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHELL_FLAGS) \
@@ -148,8 +129,9 @@ shell:
         $(LIBS)
 
 modmemvfs: 
-	$(CC) $(CFLAGS) $(SHLIB_FLAGS) modmemvfs.c -o modmemvfs.so
-
+	$(CC) $(CFLAGS) $(SHLIB_FLAGS) \
+        modmemvfs.c -o modmemvfs.o
+	$(AR) $(AR_FLAGS) modmemvfs.so modmemvfs.o
 
 libs: sqlite3.o linenoise.o
 
@@ -175,25 +157,43 @@ tests:
 #	$(CC) $(CFLAGS) -o skunkdb $(OBJS) $(LIBS) 
 
 help:
-	$(ECHO_APP)
-	$(ECHO_APP) SKUNDB Testing System for multithreaded SQLite3
-	$(ECHO_APP)
-	$(ECHO_APP) Build Targets:
-	$(ECHO_APP)
-	$(ECHO_APP) all: shell and modmemvfs plugin
-	$(ECHO_APP) libs: sqlite3.o and linenoise.o objects for linking
-	$(ECHO_APP) shell: builds the cli-sqlite3 command line interface
-	$(ECHO_APP) tests: Builds and runs all tests
-	$(ECHO_APP)
-	$(ECHO_APP) Cleaning Targets:
-	$(ECHO_APP)
-	$(ECHO_APP) clean: Removes intermediary files, leaves binaries
-	$(ECHO_APP) dataclean: Removes all database files
-	$(ECHO_APP) distclean: Removes all generated files
-	$(ECHO_APP)
-	$(ECHO_APP) For more info link-to:
-	$(ECHO_APP)
-	$(ECHO_APP) https://github.com/Sonophoto/skunkdb
-	$(ECHO_APP) https://www.sqlite.org/docs.html 
-	$(ECHO_APP)
-	
+	@/bin/echo -e \
+\\n\
+SKUNDB Testing System for multithreaded SQLite3\\n\
+\\n\
+Build Targets:\\n\
+\\n\
+      all: shell and modmemvfs plugin\\n\
+     libs: sqlite3.o and linenoise.o objects for linking\\n\
+    shell: builds the cli-sqlite3 command line interface\\n\
+modmemvfs: builds only the modmemvfs.so plugin\\n\
+    tests: Builds and runs all tests\\n\
+\\n\
+Cleaning Targets:\\n\
+\\n\
+    clean: Removes intermediary files, leaves binaries\\n\
+dataclean: Removes all database files\\n\
+distclean: Removes all generated files\\n\
+\\n\
+\\n\
+Users Make Variables: \(defaults listed first\)\\n\
+ these can be set on the command line e.g.:\\n\
+ make SQLITE_VERSION=sqlite311000 [target]\\n\
+\\n\
+SQLITE_VERSION = sqlite315002 \\n\
+ sqlite311000 \(ubuntu\)\\n\
+ sqlite315001\\n\
+\\n\
+C_STANDARD = C_GNU99_PSR_STD\\n\
+ C_GNU99_PSR_STD = $(C_GNU99_PSR_STD)\\n\
+ C_GNU89_PSR_STD = $(C_GNU89_PSR_STD)\\n\
+ C_GNU11_PSR_STD = $(C_GNU11_PSR_STD)\\n\
+ C_ANSI89P_PSR_STD = $(C_ANSI89P_PSR_STD)\\n\
+ C_ISO99P_PSR_STD = $(C_ISO99P_PSR_STD)\\n\
+ C_ISO11P_PSR_STD = $(C_ISO11P_PSR_STD)\\n\
+\\n\
+For more info link-to:\\n\
+ https://github.com/Sonophoto/skunkdb\\n\
+ https://www.sqlite.org/docs.html\\n\
+\\n
+
