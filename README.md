@@ -15,7 +15,7 @@ Inspired by a gist from @danielrmeyer
 -----
 
 #### Status:
-(07-Dec-2016 EoD): **Added spmemvfs from @spsoft with a BSD-2c license"
+(07-Dec-2016 EoD): **Added spmemvfs from @spsoft with a BSD-2c license"**
 
 (29-Now-2016    ): **sqlite3 is available in 3 versions. Ubuntu's 3.11.0, and 3.15.1 and 3.15.2**
                    The Rationale is that we can test with latest stable and Ubuntu's always outdated system version."
