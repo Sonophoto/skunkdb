@@ -56,7 +56,7 @@ GCC_DWCOVER_FLAGS = -g -Wall -fprofile-arcs -ftest-coverage
 GCC_FLAGS = $(GCC_DW_FLAGS)
 
 ### Build Flags for Static and Loadable
-STATIC_FLAGS = -static 
+STATIC_FLAGS = -static -c
 SHLIB_FLAGS = -fPIC -shared
 
 ### Now we add in all of our -Ds
@@ -79,22 +79,30 @@ $(INCLUDE_FLAGS) \
 
 ### Then our shell customizations
 #NOTE: Linenoise: We name the C file on the gcc command line, no obj.
-SHELL_FLAGS = \
+CLISQLITE_FLAGS = \
 -DHAVE_LINENOISE \
 
 ### Finally we set up the libraries we need to link with
 MATH_LIBS = -lm
 
+# Always put EXT_LIBS before LIBS in compiler calls so MATH_LIBS is dead last.
+EXT_LIBS = \
+-llinenoise \
+-lsqlite
+ 
+# BE WARY of WHICH versions of these libraries you are linking against...
+# We are using the system libraries on faith
 LIBS =	\
 -lpthread \
 -ldl \
 $(MATH_LIBS)
 
+
 ### Define any tools we are using and flag variables
 RM = rm
-RM_FLAGS = -f
+RMFLAGS = -f
 AR = ar
-AR_FLAGS = rcs
+ARFLAGS = rcs
 
 #****************************************************************************
 #  Targets          _                       _       
@@ -106,60 +114,77 @@ AR_FLAGS = rcs
 #
 #****************************************************************************
 
-all:	shell modmemvfs 
 
-sqlite3.o:  
-	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHLIB_FLAGS) \
+# These targets are laid out explicitly to ensure everything is built
+# correctly and consistently.
+# The goal is to test against different build options, so NO Implicit Rules
+# if mods are needed on any target they should be made OBVIOUS
+
+all:	libsqlite3.a liblinenoise.a modmemvfs.so cli-sqlite3
+
+# On these lib targets we get the *.o as a bonus.
+libsqlite3.a:  
+	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(STATIC_FLAGS) \
         $(SQLITE_VERSION)/sqlite3.c -o $(SQLITE_VERSION)/sqlite3.o \
         $(LIBS)
-	$(AR) $(AR_FLAGS)$(SQLITE_VERSION)/sqlite3.a $(SQLITE_VERSION)/sqlite3.o
+	$(AR) $(ARFLAGS)$(SQLITE_VERSION)/sqlite3.a $(SQLITE_VERSION)/sqlite3.o
 
-linenoise.o:  
-	$(CC) $(CFLAGS) $(SHLIB_FLAGS) \
+liblinenoise.a:  
+	$(CC) $(CFLAGS) $(STATIC_FLAGS) \
         linenoise/linenoise.c -o linenoise/linenoise.o \
         $(LIBS)
-	$(AR) $(AR_FLAGS) linenoise/linenoise.a linenoise/linenoise.o
+	$(AR) $(ARFLAGS) linenoise/$@ linenoise/linenoise.o
 
-shell:  
-	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(SHELL_FLAGS) \
+modmemvfs.so: 
+	$(CC) $(CFLAGS) $(SHLIB_FLAGS) \
+        modmemvfs.c -o modmemvfs.o
+	$(AR) $(ARFLAGS) $@ modmemvfs.o
+
+spmemvfs.so: 
+	$(CC) $(CFLAGS) $(SHLIB_FLAGS) \
+        spmemvfs.c -o spmemvfs.o
+	$(AR) $(ARFLAGS) $@ spmemvfs.o
+
+libs: sqlite3.o linenoise.o modmemvfs.so spmemvfs.so
+
+# This target intentionally DOES NOT use precompiled objs
+cli-sqlite3:  
+	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(CLISQLITE_FLAGS) \
         linenoise/linenoise.c \
         $(SQLITE_VERSION)/sqlite3.c \
         $(SQLITE_VERSION)/shell.c \
         -o $(SQLITE_VERSION)/cli-sqlite3 \
         $(LIBS)
 
-modmemvfs: 
-	$(CC) $(CFLAGS) $(SHLIB_FLAGS) \
-        modmemvfs.c -o modmemvfs.o
-	$(AR) $(AR_FLAGS) modmemvfs.so modmemvfs.o
-
-libs: sqlite3.o linenoise.o
-
-clean:
-	$(RM) $(RM_FLAGS) core *.bak
-	$(RM) $(RM_FLAGS) concurrent_read modmemvfs.so 
-	$(RM) $(RM_FLAGS) $(SQLITE_VERSION)/cli-sqlite3
-	$(RM) $(RM_FLAGS) $(SQLITE_VERSION)/sqlite3.o
-	$(RM) $(RM_FLAGS) $(SQLITE_VERSION)/sqlite3.a
-	$(RM) $(RM_FLAGS) linenoise/linenoise.o linenoise/linenoise.a
-
-dataclean:
-	$(RM) $(RM_FLAGS) *.sqlite3
-	
-
-distclean: clean dataclean
-	$(RM) $(RM_FLAGS) *.a *.o *.so *.gcno *.gcda 
-	$(RM) $(RM_FLAGS) *.gcov 
-
-
 tests:
 	$(CC) $(CFLAGS) concurrent_read.c sqlite3.c -o concurrent_read $(LIBS)
+	$(CC) $(CFLAGS) concurrent_read.c sqlite3.c -o concurrent_read $(LIBS)
+	$(CC) $(CFLAGS) concurrent_read.c sqlite3.c -o concurrent_read $(LIBS)
 #	$(CC) $(CFLAGS) -o skunkdb $(OBJS) $(LIBS) 
+
+# These Maintenance targets are NOT .phony: as there are dependencies ;-)
+clean:
+	$(RM) $(RMFLAGS) core *.bak
+	$(RM) $(RMFLAGS) concurrent_read modmemvfs.so 
+	$(RM) $(RMFLAGS) $(SQLITE_VERSION)/cli-sqlite3
+	$(RM) $(RMFLAGS) $(SQLITE_VERSION)/sqlite3.o
+	$(RM) $(RMFLAGS) $(SQLITE_VERSION)/sqlite3.a
+	$(RM) $(RMFLAGS) linenoise/linenoise.o linenoise/linenoise.a
+
+dataclean:
+	$(RM) $(RMFLAGS) *.sqlite3
+	$(RM) $(RMFLAGS) *.db
+
+distclean: clean dataclean
+	$(RM) $(RMFLAGS) *.a *.o *.so *.gcno *.gcda 
+	$(RM) $(RMFLAGS) *.gcov 
+
+
 
 help:
 	@/bin/echo -e \
 \\n\
-SKUNDB Testing System for multithreaded SQLite3\\n\
+SKUNDB: Testing System for multithreaded SQLite3\\n\
 \\n\
 Build Targets:\\n\
 \\n\
