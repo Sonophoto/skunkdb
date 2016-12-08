@@ -126,13 +126,13 @@ all:	libsqlite3.a liblinenoise.a modmemvfs.so cli-sqlite3
 libsqlite3.a:  
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(STATIC_FLAGS) \
         $(SQLITE_VERSION)/sqlite3.c -o $(SQLITE_VERSION)/sqlite3.o \
-        $(LIBS)
-	$(AR) $(ARFLAGS)$(SQLITE_VERSION)/sqlite3.a $(SQLITE_VERSION)/sqlite3.o
+        $(LIBS) 
+	$(AR) $(ARFLAGS) $(SQLITE_VERSION)/sqlite3.a $(SQLITE_VERSION)/sqlite3.o
 
 liblinenoise.a:  
 	$(CC) $(CFLAGS) $(STATIC_FLAGS) \
         linenoise/linenoise.c -o linenoise/linenoise.o \
-        $(LIBS)
+        $(LIBS) 
 	$(AR) $(ARFLAGS) linenoise/$@ linenoise/linenoise.o
 
 modmemvfs.so: 
@@ -145,7 +145,9 @@ spmemvfs.so:
         spmemvfs.c -o spmemvfs.o
 	$(AR) $(ARFLAGS) $@ spmemvfs.o
 
-libs: sqlite3.o linenoise.o modmemvfs.so spmemvfs.so
+libs: sqlite3.o linenoise.o
+
+plugins: modmemvfs.so spmemvfs.so 
 
 # This target intentionally DOES NOT use precompiled objs
 cli-sqlite3:  
@@ -157,9 +159,7 @@ cli-sqlite3:
         $(LIBS)
 
 tests:
-	$(CC) $(CFLAGS) concurrent_read.c sqlite3.c -o concurrent_read $(LIBS)
-	$(CC) $(CFLAGS) concurrent_read.c sqlite3.c -o concurrent_read $(LIBS)
-	$(CC) $(CFLAGS) concurrent_read.c sqlite3.c -o concurrent_read $(LIBS)
+#TODO
 #	$(CC) $(CFLAGS) -o skunkdb $(OBJS) $(LIBS) 
 
 # These Maintenance targets are NOT .phony: as there are dependencies ;-)
@@ -188,11 +188,11 @@ SKUNDB: Testing System for multithreaded SQLite3\\n\
 \\n\
 Build Targets:\\n\
 \\n\
-      all: shell and modmemvfs plugin\\n\
-     libs: sqlite3.o and linenoise.o objects for linking\\n\
-    shell: builds the cli-sqlite3 command line interface\\n\
-modmemvfs: builds only the modmemvfs.so plugin\\n\
-    tests: Builds and runs all tests\\n\
+       all: libsqlite3.a liblinenoise.a modmemvfs.so cli-sqlite3\\n\
+      libs: sqlite3.o linenoise.o\\n\
+   plugins: modmemvfs.so spmemvfs.so\\n\
+cli-sqlite: Builds the cli-sqlite3 command line interface\\n\
+     tests: TODO: Builds and runs all tests to generate report\\n\
 \\n\
 Cleaning Targets:\\n\
 \\n\
@@ -205,7 +205,7 @@ Users Make Variables: \(defaults listed first\)\\n\
  these can be set on the command line e.g.:\\n\
  make SQLITE_VERSION=sqlite311000 [target]\\n\
 \\n\
-SQLITE_VERSION = sqlite315002 \\n\
+SQLITE_VERSION = sqlite315002\\n\
  sqlite311000 \(ubuntu\)\\n\
  sqlite315001\\n\
 \\n\
