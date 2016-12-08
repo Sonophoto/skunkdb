@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#include "spmemvfs.h"
+#include <spmemvfs.h>
 
 void test( spmemvfs_db_t * db )
 {
