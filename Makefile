@@ -158,9 +158,35 @@ cli-sqlite3:
         -o $(SQLITE_VERSION)/cli-sqlite3 \
         $(LIBS)
 
-tests:
-#TODO
-#	$(CC) $(CFLAGS) -o skunkdb $(OBJS) $(LIBS) 
+tests: test_memvfs test_modmemvfs test_spmemvfs
+
+test_memvfs:
+	# Load and run memvfs plugin
+	$(CC) $(CFLAGS) $(SQLITE_FLAGS) \
+	$(SQLITE_VERSION)/sqlite3.c test_spmemvfs.c \
+	-o test_spmemvfs 
+	./test_spmemvfs
+
+test_modmemvfs:	
+	# Load and run modmemvfs plugin 
+	$(CC) $(CFLAGS) $(SQLITE_FLAGS) \
+	$(SQLITE_VERSION)/sqlite3.c test_modmemvfs.c \
+	-o test_modmemvfs 
+	./test_modmemvfs
+
+test_spmemvfs:
+	# Load and run spmemvfs plugin
+	$(CC) $(CFLAGS) $(SQLITE_FLAGS) \
+	$(SQLITE_VERSION)/sqlite3.c test_spmemvfs.c \
+	-o test_spmemvfs 
+	./test_spmemvfs
+
+test_concread:
+	# Load and run spmemvfs plugin
+	$(CC) $(CFLAGS) $(SQLITE_FLAGS) \
+	$(SQLITE_VERSION)/sqlite3.c test_concread.c \
+	-o test_concread 
+	./test_concread
 
 # These Maintenance targets are NOT .phony: as there are dependencies ;-)
 clean:
@@ -188,11 +214,11 @@ SKUNDB: Testing System for multithreaded SQLite3\\n\
 \\n\
 Build Targets:\\n\
 \\n\
-       all: libsqlite3.a liblinenoise.a modmemvfs.so cli-sqlite3\\n\
-      libs: sqlite3.o linenoise.o\\n\
-   plugins: modmemvfs.so spmemvfs.so\\n\
-cli-sqlite: Builds the cli-sqlite3 command line interface\\n\
-     tests: TODO: Builds and runs all tests to generate report\\n\
+        all: libsqlite3.a liblinenoise.a modmemvfs.so cli-sqlite3\\n\
+       libs: sqlite3.o linenoise.o\\n\
+    plugins: modmemvfs.so spmemvfs.so\\n\
+cli-sqlite3: Builds the cli-sqlite3 command line interface\\n\
+      tests: TODO: Builds and runs all tests to generate report\\n\
 \\n\
 Cleaning Targets:\\n\
 \\n\
