@@ -35,6 +35,35 @@
 #include <sys/stat.h>
 
 #include <spmemvfs.h>
+void test( spmemvfs_db_t * db );
+int readFile( const char * path, spmembuffer_t * mem );
+int writeFile( const char * path, spmembuffer_t * mem );
+
+int main( int argc, char * argv[] )
+{
+	const char * path = "abc.db";
+
+	spmemvfs_db_t db;
+
+	spmembuffer_t * mem = (spmembuffer_t*)calloc( sizeof( spmembuffer_t ), 1 );
+
+	spmemvfs_env_init();
+
+	readFile( path, mem );
+	spmemvfs_open_db( &db, path, mem );
+
+	assert( db.mem == mem );
+
+	test( &db );
+
+	writeFile( path, db.mem );
+
+	spmemvfs_close_db( &db );
+
+	spmemvfs_env_fini();
+
+	return 0;
+}
 
 void test( spmemvfs_db_t * db )
 {
@@ -127,29 +156,4 @@ int writeFile( const char * path, spmembuffer_t * mem )
 	return ret;
 }
 
-int main( int argc, char * argv[] )
-{
-	const char * path = "abc.db";
-
-	spmemvfs_db_t db;
-
-	spmembuffer_t * mem = (spmembuffer_t*)calloc( sizeof( spmembuffer_t ), 1 );
-
-	spmemvfs_env_init();
-
-	readFile( path, mem );
-	spmemvfs_open_db( &db, path, mem );
-
-	assert( db.mem == mem );
-
-	test( &db );
-
-	writeFile( path, db.mem );
-
-	spmemvfs_close_db( &db );
-
-	spmemvfs_env_fini();
-
-	return 0;
-}
 

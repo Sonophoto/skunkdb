@@ -122,6 +122,9 @@ ARFLAGS = rcs
 
 all:	libsqlite3.a liblinenoise.a modmemvfs.so cli-sqlite3
 
+#****************************************************************************
+# L I B R A R Y   T A R G E T S
+
 # On these lib targets we get the *.o as a bonus.
 libsqlite3.a:  
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) $(STATIC_FLAGS) \
@@ -147,6 +150,9 @@ spmemvfs.so:
 
 libs: sqlite3.o linenoise.o
 
+#****************************************************************************
+# P L U G I N  and  C L I  T A R G E T S
+
 plugins: modmemvfs.so spmemvfs.so 
 
 # This target intentionally DOES NOT use precompiled objs
@@ -158,35 +164,43 @@ cli-sqlite3:
         -o $(SQLITE_VERSION)/cli-sqlite3 \
         $(LIBS)
 
+#****************************************************************************
+# T E S T I N G   T A R G E T S
+
 tests: test_memvfs test_modmemvfs test_spmemvfs
 
 test_memvfs:
-	# Load and run memvfs plugin
+	# TODO  Dynamic load and run memvfs plugin
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) \
-	$(SQLITE_VERSION)/sqlite3.c test_spmemvfs.c \
-	-o test_spmemvfs 
-	./test_spmemvfs
+	$(SQLITE_VERSION)/sqlite3.c test_memvfs.c \
+        $(LIBS) \
+	-o test_memvfs 
+	./test_memvfs
 
 test_modmemvfs:	
-	# Load and run modmemvfs plugin 
+	# TODO  Load and run modmemvfs plugin 
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) \
 	$(SQLITE_VERSION)/sqlite3.c test_modmemvfs.c \
+        $(LIBS) \
 	-o test_modmemvfs 
 	./test_modmemvfs
 
 test_spmemvfs:
-	# Load and run spmemvfs plugin
+	# Static load and run spmemvfs plugin
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) \
-	$(SQLITE_VERSION)/sqlite3.c test_spmemvfs.c \
+	$(SQLITE_VERSION)/sqlite3.c spmemvfs.c test_spmemvfs.c \
+        $(LIBS) \
 	-o test_spmemvfs 
 	./test_spmemvfs
 
 test_concread:
-	# Load and run spmemvfs plugin
+	# TODO Load and run Dan's concurrent read and join code.
 	$(CC) $(CFLAGS) $(SQLITE_FLAGS) \
 	$(SQLITE_VERSION)/sqlite3.c test_concread.c \
-	-o test_concread 
-	./test_concread
+        $(LIBS) \
+	-o test_concread
+	$(RM) $(RMFLAGS) data.sqlite
+	./generate 100000 && ./test_concread
 
 # These Maintenance targets are NOT .phony: as there are dependencies ;-)
 clean:
