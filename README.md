@@ -4,7 +4,7 @@ This is a harness for testing threading and VFS plugin development for SQLite3
 
 This is software for POSIX/Unix/Linux/BSD terminals not Windows GUIs.
 
-Inspired by a gist from @danielrmeyer
+Inspired by a gist from @danielrmeyer https://gist.github.com/danielrmeyer/fae54d5993f2800626c616e72782b5eb
 
 ####Skunkdb is sponsored in part by http://modulemaster.com/rebuilds/about-us/
 
