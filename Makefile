@@ -122,6 +122,7 @@ ARFLAGS = rcs
 
 all:	libsqlite3.a liblinenoise.a modmemvfs.so cli-sqlite3
 
+
 #****************************************************************************
 # L I B R A R Y   T A R G E T S
 
@@ -150,10 +151,15 @@ spmemvfs.so:
 
 libs: sqlite3.o linenoise.o
 
+
 #****************************************************************************
-# P L U G I N  and  C L I  T A R G E T S
+# P L U G I N   T A R G E T S
 
 plugins: modmemvfs.so spmemvfs.so 
+
+
+#****************************************************************************
+# C L I  T A R G E T S
 
 # This target intentionally DOES NOT use precompiled objs
 cli-sqlite3:  
@@ -163,6 +169,7 @@ cli-sqlite3:
         $(SQLITE_VERSION)/shell.c \
         -o $(SQLITE_VERSION)/cli-sqlite3 \
         $(LIBS)
+
 
 #****************************************************************************
 # T E S T I N G   T A R G E T S
@@ -202,6 +209,10 @@ test_concread:
 	$(RM) $(RMFLAGS) data.sqlite
 	./generate 100000 && ./test_concread
 
+
+#****************************************************************************
+# M A I N T E N A N C E   T A R G E T S
+
 # These Maintenance targets are NOT .phony: as there are dependencies ;-)
 clean:
 	$(RM) $(RMFLAGS) core *.bak
@@ -220,6 +231,9 @@ distclean: clean dataclean
 	$(RM) $(RMFLAGS) *.gcov 
 
 
+
+#****************************************************************************
+# U S A G E  T A R G E T 
 
 help:
 	@/bin/echo -e \
