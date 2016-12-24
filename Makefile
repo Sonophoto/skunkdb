@@ -25,6 +25,7 @@ SHELL = /bin/sh
 ### We then include only the directory with that version
 ### Version number is from SQLITE_VERSION_NUMBER in sqlite3.h
 
+#SQLITE_VERSION = sqlite306020
 #SQLITE_VERSION = sqlite311000
 #SQLITE_VERSION = sqlite315001
 SQLITE_VERSION = sqlite315002
