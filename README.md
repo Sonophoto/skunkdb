@@ -1,12 +1,18 @@
 # skunkdb
 
-This is a harness for testing threading and VFS plugin development for SQLite3
+Test harness for multi-thread and VFS plugin development with SQLite3
 
-This is software for POSIX/Unix/Linux/BSD terminals not Windows GUIs.
+### STATUS Notice: This is a BSD licensed dump of dayjob work (with full permission) without some updates or the final results. However, the conclusion was, that for dayjob's purposes, an in memory R/W sqlite3 instance was not sufficiently performant when compared with the economic reality of a significant increase in hardware cost required to fully exploit the faster access to the data.
+
+### Sqlite3 is very fast anyway - and we use it with storage based DB files.
+
+### To Be Sure: Our conclusion at dayjob may not be true in your use case, and it is our hope that this project dump might give you a head-start in doing whatever testing you may need to do.
+
+This is software for POSIX/Unix/Linux/BSD terminals and is controlled via a conventional (possibly gnu) make file.
 
 Inspired by a gist from @danielrmeyer https://gist.github.com/danielrmeyer/fae54d5993f2800626c616e72782b5eb
 
-####Skunkdb is sponsored in part by http://modulemaster.com/rebuilds/about-us/
+Skunkdb is sponsored in part by http://modulemaster.com/rebuilds/about-us/
 
 ### Usage: 
 #### 1 Clone this repo
