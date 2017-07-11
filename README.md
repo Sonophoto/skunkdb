@@ -86,7 +86,7 @@ POSIX Message Queues: http://www.man7.org/tlpi/download/TLPI-52-POSIX_Message_Qu
 
 -----
 
-#####Comparative Documentation:
+##### Comparative Documentation:
 
 Message Queues in POSIX / SysV / SGI's IRIX: http://menehune.opt.wfu.edu/Kokua/More_SGI/007-2478-008/sgi_html/ch06.html
 
